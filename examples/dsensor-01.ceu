@@ -7,8 +7,5 @@ var& DSensor mysensor = spawn DSensor(_PCINT4, 7, _); //12
 
 loop do
     var bool value = await mysensor.change;
-    //await D_SENSOR_CHANGE;
     _Serial.println("teste");
 end
-
-await FOREVER;
