@@ -6,7 +6,7 @@ code/await DSensor(var int dataPort, var int? energyPort, var int? time) -> (eve
 ///////////////////////////////////////////////////////////////////////////////
 // DECLARATIONS
 ///////////////////////////////////////////////////////////////////////////////
-#define D_SENSOR_DEFAULT_TIME 4
+#define D_SENSOR_DEFAULT_TIME 1
 
 ///////////////////////////////////////////////////////////////////////////////
 // VARIABLES
@@ -26,16 +26,12 @@ code/await DSensor(var int dataPort, var int? energyPort, var int? time) -> (eve
         end
     end
 
-    _Serial.println("1");
-
     if (energyPort?) then
         //turn on
         {
             pinMode(@energyPort!, OUTPUT);
             digitalWrite(@energyPort!, HIGH);
         }
-
-        _Serial.println("2");
 
         // waits for the circuit to stabilize
         if (time?) then
@@ -44,21 +40,15 @@ code/await DSensor(var int dataPort, var int? energyPort, var int? time) -> (eve
             await (D_SENSOR_DEFAULT_TIME)ms;
         end
     end
-    
-    _Serial.println("aquiii");
 
     if (dataPort == _PCINT4 or dataPort == _PCINT5) then
         call PCINT0_Enable(dataPort, on);
-        _Serial.println("ativou a interrupção");
         every PCINT0 do
-            _Serial.println("PCINT0");
-
             var bool r = call PCINT0_Get(dataPort);
 
             if (dataPort == _PCINT4) then
                 //emit D_SENSOR_CHANGE(r);
                 emit change(r);
-                _Serial.println("enviou");
             end
             if (dataPort == _PCINT5) then
                 emit change(r);
