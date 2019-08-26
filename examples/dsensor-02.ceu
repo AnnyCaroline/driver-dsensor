@@ -1,0 +1,20 @@
+// Tested with KEYES KY-03 touch sensor
+
+#include "dsensor.ceu"
+
+_Serial.begin(9600);
+_Serial.println("dsensor-02");
+
+loop do
+    do
+        var& DSensor mysensor = spawn DSensor(_PCINT4, 7, _); //12
+        _Serial.println("ligou");
+
+        //await mysensor.change;
+        var bool v = await mysensor.change until v==high;
+        _Serial.println(">> mudou");
+    end
+
+    _Serial.println("esperando...");
+    await 3s;
+end
