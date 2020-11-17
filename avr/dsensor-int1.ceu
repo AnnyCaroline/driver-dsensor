@@ -1,0 +1,48 @@
+#include "int1.ceu"
+#include "wclock.ceu"
+
+#include "./common/declarations.ceu"
+
+code/await DSensor_INT1(var int? energyPort, var int? time, var int? debounce) -> (event bool change) -> NEVER;
+
+code/await DSensor_INT1(var int? energyPort, var int? time, var int? debounce) -> (event bool change) -> NEVER do
+    do finalize with
+        if (energyPort?) then
+            _digitalWrite(energyPort!, low);
+        end
+    end
+
+    if (energyPort?) then
+        //turn on
+        {
+            pinMode(@energyPort!, OUTPUT);
+            digitalWrite(@energyPort!, HIGH);
+        }
+
+        // waits for the circuit to stabilize
+        if (time?) then
+            await (time!)ms;
+        else
+            await (D_SENSOR_DEFAULT_TIME)ms;
+        end
+    end
+    
+    loop do
+        await INT1;
+        
+        // debounce
+        if (debounce?) then
+            await (debounce!)ms;
+        else
+            await (D_SENSOR_DEFAULT_DEBOUNCE)ms;
+        end
+
+        var high/low v = call INT1_Get();
+        
+        _Serial.print(">> changed: ");
+        _Serial.println(v);
+
+        emit change(v);
+    end
+end
+

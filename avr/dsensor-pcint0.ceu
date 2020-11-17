@@ -1,0 +1,54 @@
+#include "pcint0.ceu"
+#include "wclock.ceu"
+
+#include "./common/declarations.ceu"
+
+code/await DSensor_PCINT0(var int dataPort, var int? energyPort, var int? time, var int? debounce) -> (event bool change) -> NEVER;
+
+code/await DSensor_PCINT0(var int dataPort, var int? energyPort, var int? time, var int? debounce) -> (event bool change) -> NEVER do
+    do finalize with
+        if (energyPort?) then
+            _digitalWrite(energyPort!, low);
+        end
+
+        call PCINT0_Enable(dataPort, off);
+    end
+
+    if (energyPort?) then
+        //turn on
+        {
+            pinMode(@energyPort!, OUTPUT);
+            digitalWrite(@energyPort!, HIGH);
+        }
+
+        // waits for the circuit to stabilize
+        if (time?) then
+            await (time!)ms;
+        else
+            await (D_SENSOR_DEFAULT_TIME)ms;
+        end
+    end    
+
+    call PCINT0_Enable(dataPort, on);
+
+    var& PCINT0_Demux pcint0 = spawn PCINT0_Demux();
+
+    loop do
+        var int pin;
+        var high/low v;
+
+        (pin,v) = await pcint0.e until (pin == dataPort);
+        
+        // debounce
+        if (debounce?) then
+            await (debounce!)ms;
+        else
+            await (D_SENSOR_DEFAULT_DEBOUNCE)ms;
+        end
+
+        _Serial.print(">> changed: ");
+        _Serial.println(v);
+        emit change(v);
+    end
+end
+

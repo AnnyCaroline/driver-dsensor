@@ -1,0 +1,12 @@
+#include "dsensor-pcint0.ceu"
+
+_Serial.begin(9600);
+_Serial.println("dsensor-01");
+
+var& DSensor_PCINT0 mysensor = spawn DSensor_PCINT0(_PCINT4, 7, _, _); // UNO=D12, MEGA=D10
+
+var bool v = await mysensor.change until v==high;
+
+_Serial.println("the end");
+
+await FOREVER;
