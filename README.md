@@ -1,6 +1,6 @@
 # Driver for Digital Sensors
 
 - With external interrupts
-    - [doc]()
+    - [doc](int.md)
 - With pin-change interrupts
-    - [doc]()
+    - [doc](pcint.md)
