@@ -14,7 +14,7 @@ code/await DSensor-INTX(var int dataPort, var int? energyPort, var int? time, va
 
 Parameters:
 
-- `int`: analog port for receive data
+- `int`: digital port for receive data
 - `int`: energy port used to turn on and off the sensor
 - `int?`: time, in ms, the driver waits for the circuit to stabilize
 - `int?`: debouce time, in ms
